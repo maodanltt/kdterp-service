@@ -1,25 +1,29 @@
 package com.tywh.kdterp.inventory.service.impl;
 
-import com.tywh.erp.bean.Condition;
-import com.tywh.erp.bean.Item;
-import com.tywh.erp.inventory.dao.ItemDao;
-import com.tywh.erp.inventory.dao.impl.ItemDaoImpl;
-import com.tywh.erp.inventory.service.ItemService;
+import com.tywh.kdterp.inventory.mapper.ItemMapper;
+import com.tywh.kdterp.inventory.service.ItemService;
+import com.tywh.kdterp.pojo.Condition;
+import com.tywh.kdterp.pojo.Item;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class ItemServiceImpl implements ItemService {
 
-    private ItemDao itemDao = new ItemDaoImpl();
+    @Autowired
+    private ItemMapper itemMapper;
 
     @Override
     public Map<String,Object> queryItem(Condition condition) {
         String ksqj = condition.getStartdate().substring(0,7);
         String jsqj = condition.getEnddate().substring(0,7);
         Map<String, Object> retMap = new HashMap<>();
+        Map<String, Integer> kucunMap = new HashMap<>();
         List<Item> itemList = null;
         Integer zxscs = 0;
         Integer zqckc = 0;
@@ -29,9 +33,14 @@ public class ItemServiceImpl implements ItemService {
         NumberFormat nf = NumberFormat.getPercentInstance();
         nf.setMinimumFractionDigits(2);
         try {
-            itemList = itemDao.queryItemList(condition);
-            Map<String, Integer> kucunMap = itemDao.queryKucun();
-//          zxscs = itemDao.queryZxscs(condition);
+            itemList = itemMapper.queryItemList(condition);
+            List<Item> kucunItemList= itemMapper.queryKucun(condition);
+            for (Item item : kucunItemList) {
+                String qckcKey = item.getShum() + "-" + item.getGjdj() + "-" + item.getTsfljc() + "-" + item.getKjqj() + "-qckc";
+                String qmkcKey = item.getShum() + "-" + item.getGjdj() + "-" + item.getTsfljc() + "-" + item.getKjqj() + "-qmkc";
+                kucunMap.put(qckcKey,item.getQckc());
+                kucunMap.put(qmkcKey,item.getQmkc());
+            }
             for (Item item : itemList) {
                 Integer xscs = item.getXscs();
                 zxscs = zxscs + xscs;
