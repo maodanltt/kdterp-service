@@ -22,7 +22,7 @@ public class ItemServiceImpl implements ItemService {
     public Map<String,Object> queryItem(Condition condition) {
         String ksqj = condition.getStartdate().substring(0,7);
         String jsqj = condition.getEnddate().substring(0,7);
-        Map<String, Object> retMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
         Map<String, Integer> kucunMap = new HashMap<>();
         List<Item> itemList = null;
         Integer zxscs = 0;
@@ -42,7 +42,7 @@ public class ItemServiceImpl implements ItemService {
                 kucunMap.put(qmkcKey,item.getQmkc());
             }
             for (Item item : itemList) {
-                Integer xscs = item.getXscs();
+                Integer xscs = item.getXscs() == null ? 0 : item.getXscs();
                 zxscs = zxscs + xscs;
             }
 
@@ -51,7 +51,8 @@ public class ItemServiceImpl implements ItemService {
                 String qmkcKey = item.getKey() + "-" + jsqj + "-qmkc";
                 Integer qckc = kucunMap.get(qckcKey) == null ? 0 : kucunMap.get(qckcKey);
                 Integer qmkc = kucunMap.get(qmkcKey) == null ? 0 : kucunMap.get(qmkcKey);
-                Integer xscs = item.getXscs();
+                Integer xscs = item.getXscs() == null ? 0 : item.getXscs();
+                item.setXscs(xscs);
                 item.setQckc(qckc);
                 item.setQmkc(qmkc);
                 zqckc = zqckc + qckc;
@@ -77,12 +78,12 @@ public class ItemServiceImpl implements ItemService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        retMap.put("itemList",itemList);
-        retMap.put("zxscs",zxscs);
-        retMap.put("zkczzl", zkczzl);
-        retMap.put("zqckc", zqckc);
-        retMap.put("zqmkc", zqmkc);
-        return retMap;
+        resultMap.put("itemList",itemList);
+        resultMap.put("zxscs",zxscs);
+        resultMap.put("zkczzl", zkczzl);
+        resultMap.put("zqckc", zqckc);
+        resultMap.put("zqmkc", zqmkc);
+        return resultMap;
     }
 
 }
